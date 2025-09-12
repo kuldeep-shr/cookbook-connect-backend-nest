@@ -1,0 +1,35 @@
+# src/graphql/auth.schema.graphql
+
+scalar DateTime
+
+type User {
+  id: ID!
+  email: String!
+  name: String
+  createdAt: DateTime!
+}
+
+type AuthPayload {
+  token: String!
+  user: User!
+}
+
+input SignupInput {
+  email: String!
+  password: String!
+  name: String
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type Query {
+  me: User! # Returns the currently logged-in user
+}
+
+type Mutation {
+  signup(input: SignupInput!): AuthPayload!
+  login(input: LoginInput!): AuthPayload!
+}

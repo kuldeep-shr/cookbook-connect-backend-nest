@@ -1,0 +1,40 @@
+# src/graphql/auth.graphql
+
+# Input types
+input RegisterInput {
+  email: String!
+  password: String!
+  name: String
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+# Return types
+type AuthPayload {
+  token: String!
+  userId: ID
+  name: String!
+  email: String!
+}
+
+# Queries (if needed)
+type Query {
+  me: User
+}
+
+# Mutations
+type Mutation {
+  signup(input: RegisterInput!): AuthPayload!
+  signin(input: LoginInput!): AuthPayload!
+}
+
+# User type (simplified)
+type User {
+  id: ID!
+  email: String!
+  name: String
+  createdAt: String!
+}

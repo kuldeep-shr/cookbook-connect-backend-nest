@@ -1,0 +1,42 @@
+# Inputs
+input CreateRecipeInput {
+  title: String!
+  description: String!
+  cuisine: String
+  difficulty: String
+  cookingTime: Int
+}
+
+input UpdateRecipeInput {
+  id: ID!
+  title: String
+  description: String
+  cuisine: String
+  difficulty: String
+  cookingTime: Int
+}
+
+# Types
+type Recipe {
+  id: ID!
+  title: String!
+  description: String!
+  cuisine: String
+  difficulty: String
+  cookingTime: Int
+  author: User!
+  createdAt: String!
+}
+
+# Mutations
+type Mutation {
+  createRecipe(input: CreateRecipeInput!): Recipe!
+  updateRecipe(input: UpdateRecipeInput!): Recipe!
+  deleteRecipe(id: ID!): Boolean!
+}
+
+# Queries
+type Query {
+  recipe(id: ID!): Recipe
+  recipes: [Recipe!]!
+}

@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  password  String
+  name      String?
+  followers Follow[]   @relation("UserFollowers")
+  following Follow[]   @relation("UserFollowing")
+  recipes   Recipe[]
+  ratings   Rating[]
+  comments  Comment[]
+  createdAt DateTime   @default(now())
+}
+
+model Recipe {
+  id           String        @id @default(uuid())
+  title        String
+  description  String
+  cuisine      String?
+  difficulty   String?
+  cookingTime  Int?          // in minutes
+  ingredients  Ingredient[]
+  instructions Instruction[]
+  ratings      Rating[]
+  comments     Comment[]
+  author       User          @relation(fields: [authorId], references: [id])
+  authorId     String
+  createdAt    DateTime      @default(now())
+}
+
+model Ingredient {
+  id        String   @id @default(uuid())
+  name      String
+  quantity  String
+  recipe    Recipe   @relation(fields: [recipeId], references: [id])
+  recipeId  String
+}
+
+model Instruction {
+  id        String   @id @default(uuid())
+  stepNo    Int
+  text      String
+  recipe    Recipe   @relation(fields: [recipeId], references: [id])
+  recipeId  String
+}
+
+model Rating {
+  id        String   @id @default(uuid())
+  value     Int      // 1–5 stars
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  recipe    Recipe   @relation(fields: [recipeId], references: [id])
+  recipeId  String
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  text      String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  recipe    Recipe   @relation(fields: [recipeId], references: [id])
+  recipeId  String
+  createdAt DateTime @default(now())
+}
+
+model Follow {
+  id          String @id @default(uuid())
+  follower    User   @relation("UserFollowing", fields: [followerId], references: [id])
+  followerId  String
+  following   User   @relation("UserFollowers", fields: [followingId], references: [id])
+  followingId String
+
+  @@unique([followerId, followingId])
+}
