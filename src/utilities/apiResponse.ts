@@ -1,6 +1,5 @@
-<<<<<<< HEAD
-import { Response } from "express";
-import httpStatusCodes from "http-status-codes";
+import { Response } from 'express';
+import httpStatusCodes from 'http-status-codes';
 
 export interface IOverrideRequest {
   code: number;
@@ -19,7 +18,7 @@ export default class ApiResponse {
     res: Response,
     data: object,
     status: number = 200,
-    message?: string
+    message?: string,
   ) => {
     return res.status(status).json({
       data,
@@ -31,7 +30,7 @@ export default class ApiResponse {
   static error = (
     res: Response,
     status: number = 400,
-    error: string = httpStatusCodes.getStatusText(status)
+    error: string = httpStatusCodes.getStatusText(status),
   ) => {
     return res.status(status).json({
       error: {
@@ -52,21 +51,8 @@ export default class ApiResponse {
     res: Response,
     view: string,
     params?: object,
-    status: number = 200
+    status: number = 200,
   ) => {
     return res.status(status).render(view, params);
   };
-=======
-import { Response } from 'express';
-
-export class ApiResponse {
-  static setCookie(
-    res: Response,
-    key: string,
-    value: string,
-    options: Record<string, any>,
-  ): Response {
-    return res.cookie(key, value, options);
-  }
->>>>>>> cdd4c90 (refactor(core): restructure project into NestJS architecture)
 }
