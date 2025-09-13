@@ -1,0 +1,201 @@
+# ========================
+# Object Types
+# ========================
+
+type User {
+  id: ID!
+  email: String!
+  name: String
+  createdAt: String!
+  # relations
+  recipes: [Recipe!]!
+  followers: [User!]! # users who follow me
+  following: [User!]! # users I follow
+  comments: [RecipeComment!]!
+}
+
+type Recipe {
+  id: ID!
+  title: String!
+  description: String!
+  cuisine: String
+  difficulty: String
+  cookingTime: Int
+  createdAt: String!
+  author: User!
+  ingredients: [Ingredient!]!
+  instructions: [Instruction!]!
+  comments: [RecipeComment!]!
+  ratings: [Rating!]!
+  averageRating: Float
+  commentCount: Int
+}
+
+type Ingredient {
+  id: ID!
+  name: String!
+  quantity: String!
+  recipe: Recipe!
+}
+
+type Instruction {
+  id: ID!
+  stepNo: Int!
+  text: String!
+  recipe: Recipe!
+}
+
+type RecipeComment {
+  id: ID!
+  text: String!
+  createdAt: String!
+  author: User! # Must not be null
+  recipe: Recipe!
+}
+
+type Rating {
+  id: ID!
+  value: Int! # 1–5 stars
+  createdAt: String!
+  author: User!
+  recipe: Recipe!
+}
+
+# ========================
+# Input Types
+# ========================
+
+input CreateIngredientInput {
+  name: String!
+  quantity: String!
+}
+
+input CreateInstructionInput {
+  stepNo: Int!
+  text: String!
+}
+
+input CreateRecipeInput {
+  title: String!
+  description: String!
+  cuisine: String
+  difficulty: String
+  cookingTime: Int
+  ingredients: [CreateIngredientInput!]
+  instructions: [CreateInstructionInput!]
+}
+
+input UpdateRecipeInput {
+  id: ID!
+  title: String
+  description: String
+  cuisine: String
+  difficulty: String
+  cookingTime: Int
+  ingredients: [CreateIngredientInput!]
+  instructions: [CreateInstructionInput!]
+}
+
+input UpdateUserInput {
+  name: String
+  email: String
+}
+
+input RegisterInput {
+  email: String!
+  password: String!
+  name: String
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input CreateRecipeCommentInput {
+  recipeId: ID!
+  text: String!
+}
+
+input CreateRatingInput {
+  recipeId: ID!
+  value: Int!
+}
+
+# ========================
+# Auth Payload
+# ========================
+
+type AuthPayload {
+  token: String!
+  userId: ID
+  name: String!
+  email: String!
+}
+
+type Rating {
+  id: ID!
+  value: Int!
+  createdAt: String!
+  author: User!
+  recipe: Recipe!
+}
+
+input CreateRatingInput {
+  recipeId: ID!
+  value: Int!
+}
+
+# ========================
+# Root Queries
+# ========================
+
+type Query {
+  # Auth
+  me: User
+
+  # Users
+  users(id: ID): [User!]!
+
+  # Recipes
+  recipes: [Recipe!]!
+  recipe(id: ID!): Recipe
+
+  # Advanced queries
+  recipesByIngredients(ingredients: [String!]!): [Recipe!]!
+  recommendedRecipes(userId: ID!): [Recipe!]!
+  topUsersByFollowers(limit: Int): [User!]!
+  feed(userId: ID!): [Recipe!]!
+
+  # Get comments for a specific recipe
+  commentsByRecipe(recipeId: ID!): [RecipeComment!]!
+}
+
+# ========================
+# Root Mutations
+# ========================
+
+type Mutation {
+  # Auth
+  signup(input: RegisterInput!): AuthPayload!
+  signin(input: LoginInput!): AuthPayload!
+
+  # Users
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+  followUser(followerId: ID!, followingId: ID!): Boolean!
+  unfollowUser(followerId: ID!, followingId: ID!): Boolean!
+
+  # Recipes
+  createRecipe(input: CreateRecipeInput!): Recipe!
+  updateRecipe(input: UpdateRecipeInput!): Recipe!
+  deleteRecipe(id: ID!): Boolean!
+
+  # Comments
+  addComment(input: CreateRecipeCommentInput!): RecipeComment!
+  deleteComment(id: ID!): Boolean!
+
+  # Ratings
+  addRating(input: CreateRatingInput!): Rating!
+  updateRating(id: ID!, value: Int!): Rating!
+  deleteRating(id: ID!): Boolean!
+}

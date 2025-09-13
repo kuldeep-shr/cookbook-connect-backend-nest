@@ -1,11 +1,26 @@
-import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, ID, Context } from '@nestjs/graphql';
 import { UserService } from './user.service';
 import { UpdateUserInput } from './dto/update-user.input';
 import { UserModel } from './dto/user.model';
+import { verifyToken } from '../utilities/ApiUtilities';
+import { UnauthorizedException } from '@nestjs/common';
+// import { CommentModel } from './dto/comment.model';
+// import { CreateCommentInput } from './dto/create-comment.input';
 
 @Resolver(() => UserModel)
 export class UserResolver {
+  commentService: any;
   constructor(private userService: UserService) {}
+
+  private getUserIdFromContext(ctx: any): string {
+    const authHeader = ctx?.req?.headers?.authorization;
+    if (!authHeader)
+      throw new UnauthorizedException('Authorization header missing');
+    const token = authHeader.replace('Bearer ', '').trim();
+    const payload = verifyToken(token);
+    if (!payload?.id) throw new UnauthorizedException('Invalid token');
+    return payload.id;
+  }
 
   @Query(() => [UserModel], { nullable: true })
   async users(@Args('id', { type: () => ID, nullable: true }) id?: string) {
@@ -19,5 +34,23 @@ export class UserResolver {
     @Args('input') input: UpdateUserInput,
   ) {
     return this.userService.updateUser(id, input);
+  }
+
+  @Mutation(() => Boolean)
+  async followUser(
+    @Args('userId') userId: string,
+    @Context() ctx: any,
+  ): Promise<boolean> {
+    const currentUserId = this.getUserIdFromContext(ctx);
+    return this.userService.followUser(currentUserId, userId);
+  }
+
+  @Mutation(() => Boolean)
+  async unfollowUser(
+    @Args('userId') userId: string,
+    @Context() ctx: any,
+  ): Promise<boolean> {
+    const currentUserId = this.getUserIdFromContext(ctx);
+    return this.userService.unfollowUser(currentUserId, userId);
   }
 }

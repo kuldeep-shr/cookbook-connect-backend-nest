@@ -52,23 +52,27 @@ model Instruction {
   recipeId  String
 }
 
-model Rating {
-  id        String   @id @default(uuid())
-  value     Int      // 1–5 stars
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  recipe    Recipe   @relation(fields: [recipeId], references: [id])
-  recipeId  String
-}
 
 model Comment {
   id        String   @id @default(uuid())
   text      String
+  createdAt DateTime @default(now())
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
+  recipe    Recipe   @relation(fields: [recipeId], references: [id])
+  recipeId  String
+}
+
+model Rating {
+  id        String   @id @default(uuid())
+  value     Int
   user      User     @relation(fields: [userId], references: [id])
   userId    String
   recipe    Recipe   @relation(fields: [recipeId], references: [id])
   recipeId  String
-  createdAt DateTime @default(now())
+  createdAt DateTime   @default(now())
+
+  @@unique([userId, recipeId]) // user can rate a recipe only once
 }
 
 model Follow {
@@ -77,6 +81,7 @@ model Follow {
   followerId  String
   following   User   @relation("UserFollowers", fields: [followingId], references: [id])
   followingId String
+  createdAt DateTime   @default(now())
 
   @@unique([followerId, followingId])
 }
