@@ -163,6 +163,7 @@ type Query {
 
   # Advanced queries
   recipesByIngredients(ingredients: [String!]!): [Recipe!]!
+
   recommendedRecipes(userId: ID!): [Recipe!]!
   topUsersByFollowers(limit: Int): [User!]!
   feed(userId: ID!): [Recipe!]!

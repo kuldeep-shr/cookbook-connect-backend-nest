@@ -60,35 +60,40 @@ export class RecipeResolver {
     }
   }
 
-  /**
-   * Get a single recipe by ID
-   */
-  @Query(() => RecipeModel, { name: 'recipe', nullable: true })
-  async getRecipe(
-    @Args('id', { type: () => ID }) id: string,
-  ): Promise<RecipeModel | null> {
-    try {
-      const recipe = await this.recipeService.getRecipe(id);
-      if (!recipe) throw new NotFoundException('Recipe not found');
-      return recipe;
-    } catch (err: any) {
-      throw new NotFoundException(err.message || 'Recipe not found');
-    }
+  @Query(() => [RecipeModel])
+  async recipes() {
+    return this.recipeService.getAllRecipes();
   }
 
-  /**
-   * Get all recipes
-   */
-  @Query(() => [RecipeModel], { name: 'recipes' })
-  async getAllRecipes(): Promise<RecipeModel[]> {
-    try {
-      return await this.recipeService.getAllRecipes();
-    } catch (err: any) {
-      throw new InternalServerErrorException(
-        err.message || 'Failed to fetch recipes',
-      );
-    }
+  @Query(() => RecipeModel, { nullable: true })
+  async recipe(@Args('id', { type: () => ID }) id: string) {
+    return this.recipeService.getRecipe(id);
   }
+
+  // ========================
+  // Advanced Queries
+  // ========================
+
+  @Query(() => [RecipeModel])
+  async recipesByIngredients(
+    @Args('ingredients', { type: () => [String] }) ingredients: string[],
+  ) {
+    // return this.recipeService.getRecipesByIngredients(ingredients);
+
+    return await this.recipeService.getRecipesByIngredients(ingredients);
+  }
+
+  @Query(() => [RecipeModel])
+  async feed(@Args('userId', { type: () => ID }) userId: string) {
+    return this.recipeService.getUserFeed(userId);
+  }
+
+  // @Query(() => [RecipeModel])
+  // async topUsersByFollowers(
+  //   @Args('limit', { type: () => Number, nullable: true }) limit?: number,
+  // ) {
+  //   return this.recipeService.getTopUsersByFollowers(limit ?? 5);
+  // }
 
   /**
    * Update a recipe (only owner can update)
