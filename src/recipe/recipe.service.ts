@@ -14,25 +14,32 @@ export class RecipeService {
   async createRecipe(input: CreateRecipeInput, userId: string) {
     return this.prisma.recipe.create({
       data: {
-        ...input,
+        title: input.title,
+        description: input.description,
+        cuisine: input.cuisine,
+        difficulty: input.difficulty,
+        cookingTime: input.cookingTime,
         authorId: userId,
+        ingredients: {
+          create:
+            input.ingredients?.map((i) => ({
+              name: i.name,
+              quantity: i.quantity,
+            })) || [],
+        },
+        instructions: {
+          create:
+            input.instructions?.map((i) => ({
+              stepNo: i.stepNo,
+              text: i.text,
+            })) || [],
+        },
       },
-      include: { author: true },
-    });
-  }
-
-  async getRecipe(id: string) {
-    const recipe = await this.prisma.recipe.findUnique({
-      where: { id },
-      include: { author: true },
-    });
-    if (!recipe) throw new NotFoundException('Recipe not found');
-    return recipe;
-  }
-
-  async getAllRecipes() {
-    return this.prisma.recipe.findMany({
-      include: { author: true },
+      include: {
+        author: true,
+        ingredients: true,
+        instructions: true,
+      },
     });
   }
 
@@ -41,13 +48,63 @@ export class RecipeService {
       where: { id: input.id },
     });
     if (!recipe) throw new NotFoundException('Recipe not found');
-    if (recipe.authorId !== userId)
-      throw new UnauthorizedException('Not allowed');
+    if (recipe.authorId !== userId) {
+      throw new UnauthorizedException('Not authorized to update this recipe');
+    }
 
     return this.prisma.recipe.update({
       where: { id: input.id },
-      data: { ...input },
-      include: { author: true },
+      data: {
+        title: input.title ?? recipe.title,
+        description: input.description ?? recipe.description,
+        cuisine: input.cuisine ?? recipe.cuisine,
+        difficulty: input.difficulty ?? recipe.difficulty,
+        cookingTime: input.cookingTime ?? recipe.cookingTime,
+        ingredients: {
+          deleteMany: { recipeId: input.id },
+          create:
+            input.ingredients?.map((i) => ({
+              name: i.name,
+              quantity: i.quantity,
+            })) || [],
+        },
+        instructions: {
+          deleteMany: { recipeId: input.id },
+          create:
+            input.instructions?.map((i) => ({
+              stepNo: i.stepNo,
+              text: i.text,
+            })) || [],
+        },
+      },
+      include: {
+        author: true,
+        ingredients: true,
+        instructions: true,
+      },
+    });
+  }
+
+  async getRecipe(id: string) {
+    const recipe = await this.prisma.recipe.findUnique({
+      where: { id },
+      include: {
+        author: true,
+        ingredients: true,
+        instructions: true,
+      },
+    });
+    if (!recipe) throw new NotFoundException('Recipe not found');
+    return recipe;
+  }
+
+  async getAllRecipes() {
+    return this.prisma.recipe.findMany({
+      include: {
+        author: true,
+        ingredients: true,
+        instructions: true,
+      },
     });
   }
 
@@ -55,9 +112,9 @@ export class RecipeService {
     const recipe = await this.prisma.recipe.findUnique({ where: { id } });
     if (!recipe) throw new NotFoundException('Recipe not found');
     if (recipe.authorId !== userId)
-      throw new UnauthorizedException('Not allowed');
+      throw new UnauthorizedException('Not allowed to delete this recipe');
 
     await this.prisma.recipe.delete({ where: { id } });
-    return { message: 'Recipe deleted successfully' };
+    return 'Recipe deleted successfully'; // ✅ match resolver return type
   }
 }

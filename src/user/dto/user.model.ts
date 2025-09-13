@@ -9,7 +9,7 @@ export class UserModel {
   email!: string;
 
   @Field({ nullable: true })
-  name?: string;
+  name?: string | null;
 
   @Field()
   createdAt!: Date;

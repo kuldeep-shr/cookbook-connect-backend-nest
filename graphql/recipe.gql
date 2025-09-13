@@ -1,10 +1,63 @@
-# Inputs
+# ========================
+# Object Types
+# ========================
+
+type User {
+  id: ID!
+  email: String!
+  name: String
+  createdAt: String!
+}
+
+type Recipe {
+  id: ID!
+  title: String!
+  description: String!
+  cuisine: String
+  difficulty: String
+  cookingTime: Int
+  createdAt: String!
+  author: User!
+  ingredients: [Ingredient!]!
+  instructions: [Instruction!]!
+}
+
+type Ingredient {
+  id: ID!
+  name: String!
+  quantity: String!
+  recipe: Recipe!
+}
+
+type Instruction {
+  id: ID!
+  stepNo: Int!
+  text: String!
+  recipe: Recipe!
+}
+
+# ========================
+# Input Types
+# ========================
+
+input CreateIngredientInput {
+  name: String!
+  quantity: String!
+}
+
+input CreateInstructionInput {
+  stepNo: Int!
+  text: String!
+}
+
 input CreateRecipeInput {
   title: String!
   description: String!
   cuisine: String
   difficulty: String
   cookingTime: Int
+  ingredients: [CreateIngredientInput!]
+  instructions: [CreateInstructionInput!]
 }
 
 input UpdateRecipeInput {
@@ -14,29 +67,33 @@ input UpdateRecipeInput {
   cuisine: String
   difficulty: String
   cookingTime: Int
+  ingredients: [CreateIngredientInput!]
+  instructions: [CreateInstructionInput!]
 }
 
-# Types
-type Recipe {
-  id: ID!
-  title: String!
-  description: String!
-  cuisine: String
-  difficulty: String
-  cookingTime: Int
-  author: User!
-  createdAt: String!
-}
+# ========================
+# Root Query
+# ========================
 
-# Mutations
-type Mutation {
-  createRecipe(input: CreateRecipeInput!): Recipe!
-  updateRecipe(input: UpdateRecipeInput!): Recipe!
-  deleteRecipe(id: ID!): Boolean!
-}
-
-# Queries
 type Query {
-  recipe(id: ID!): Recipe
+  # Fetch all recipes
   recipes: [Recipe!]!
+
+  # Fetch a single recipe by ID
+  recipe(id: ID!): Recipe
+}
+
+# ========================
+# Root Mutation
+# ========================
+
+type Mutation {
+  # Create a new recipe
+  createRecipe(input: CreateRecipeInput!): Recipe!
+
+  # Update an existing recipe
+  updateRecipe(input: UpdateRecipeInput!): Recipe!
+
+  # Delete a recipe by ID
+  deleteRecipe(id: ID!): Boolean!
 }

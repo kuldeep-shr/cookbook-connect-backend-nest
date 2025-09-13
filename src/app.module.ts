@@ -13,7 +13,7 @@ import { Request, Response } from 'express';
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver, // ✅ required in v10
-      typePaths: [join(process.cwd(), 'graphql/**/*.gql')],
+      typePaths: [join(process.cwd(), '/graphql/**/*.gql')],
       sortSchema: true, // optional: sorts schema alphabetically
       playground: true, // enable GraphQL playground
       introspection: true, // allow introspection

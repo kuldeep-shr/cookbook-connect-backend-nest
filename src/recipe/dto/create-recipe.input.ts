@@ -1,6 +1,24 @@
 import { InputType, Field, Int } from '@nestjs/graphql';
 
 @InputType()
+export class CreateIngredientInput {
+  @Field()
+  name!: string;
+
+  @Field()
+  quantity!: string;
+}
+
+@InputType()
+export class CreateInstructionInput {
+  @Field(() => Int)
+  stepNo!: number;
+
+  @Field()
+  text!: string;
+}
+
+@InputType()
 export class CreateRecipeInput {
   @Field()
   title!: string;
@@ -16,4 +34,10 @@ export class CreateRecipeInput {
 
   @Field(() => Int, { nullable: true })
   cookingTime?: number;
+
+  @Field(() => [CreateIngredientInput], { nullable: true })
+  ingredients?: CreateIngredientInput[];
+
+  @Field(() => [CreateInstructionInput], { nullable: true })
+  instructions?: CreateInstructionInput[];
 }

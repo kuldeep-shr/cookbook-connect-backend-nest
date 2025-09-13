@@ -1,4 +1,22 @@
-import { InputType, Field, Int, ID } from '@nestjs/graphql';
+import { InputType, Field, ID, Int } from '@nestjs/graphql';
+
+@InputType()
+export class UpdateIngredientInput {
+  @Field()
+  name!: string;
+
+  @Field()
+  quantity!: string;
+}
+
+@InputType()
+export class UpdateInstructionInput {
+  @Field(() => Int)
+  stepNo!: number;
+
+  @Field()
+  text!: string;
+}
 
 @InputType()
 export class UpdateRecipeInput {
@@ -19,4 +37,10 @@ export class UpdateRecipeInput {
 
   @Field(() => Int, { nullable: true })
   cookingTime?: number;
+
+  @Field(() => [UpdateIngredientInput], { nullable: true })
+  ingredients?: UpdateIngredientInput[];
+
+  @Field(() => [UpdateInstructionInput], { nullable: true })
+  instructions?: UpdateInstructionInput[];
 }
